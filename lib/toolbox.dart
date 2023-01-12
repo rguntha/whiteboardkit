@@ -43,8 +43,8 @@ class _ToolBoxState extends State<ToolBox> {
 
   @override
   void initState() {
-    brushSize = 20.0;
-    brushColor = Colors.blue;
+    brushSize = 5.0;
+    brushColor = Colors.black;
     erase = false;
     eraserSize = 20.0;
 
@@ -127,48 +127,48 @@ class _ToolBoxState extends State<ToolBox> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              // Container(
+              //   margin: EdgeInsets.all(10),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: <Widget>[
+              //       // _buildToolButton(
+              //       //   Icon(
+              //       //     FontAwesomeIcons.pen,
+              //       //     size: 20,
+              //       //   ),
+              //       //   select: ToolBoxSelected.size,
+              //       // ),
+              //       // _buildToolButton(Icon(Icons.color_lens),
+              //       //     select: ToolBoxSelected.color, color: brushColor),
+              //       // _buildToolButton(
+              //       //   Icon(
+              //       //     FontAwesomeIcons.eraser,
+              //       //     color: new Color(0xffff93f5),
+              //       //     size: 26.0,
+              //       //   ),
+              //       //   select: ToolBoxSelected.erase,
+              //       // ),
+              //     ],
+              //   ),
+              //   decoration: BoxDecoration(
+              //     color: Colors.white,
+              //     borderRadius: BorderRadius.circular(20),
+              //   ),
+              // ),
               Container(
                 margin: EdgeInsets.all(10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    _buildToolButton(
-                      Icon(
-                        FontAwesomeIcons.pen,
-                        size: 20,
-                      ),
-                      select: ToolBoxSelected.size,
-                    ),
-                    _buildToolButton(Icon(Icons.color_lens),
-                        select: ToolBoxSelected.color, color: brushColor),
-                    _buildToolButton(
-                      Icon(
-                        FontAwesomeIcons.eraser,
-                        color: new Color(0xffff93f5),
-                        size: 26.0,
-                      ),
-                      select: ToolBoxSelected.erase,
-                    ),
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    _buildToolButton(
-                      Icon(
-                        FontAwesomeIcons.file,
-                        size: 26.0,
-                        color: widget.color,
-                      ),
-                      onPress: () => {widget.sketchController.wipe()},
-                    ),
+                    // _buildToolButton(
+                    //   Icon(
+                    //     FontAwesomeIcons.file,
+                    //     size: 26.0,
+                    //     color: widget.color,
+                    //   ),
+                    //   onPress: () => {widget.sketchController.wipe()},
+                    // ),
                     if (widget.options.undo)
                       _buildToolButton(
                           Icon(
