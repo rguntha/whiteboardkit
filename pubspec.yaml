@@ -14,7 +14,7 @@ dependencies:
   font_awesome_flutter: ^8.4.0
 #  xml: ^3.3.1
   async: ^2.4.1
-  synchronized: ^2.2.0
+#  synchronized: ^2.2.0
 
 dev_dependencies:
   flutter_test:
