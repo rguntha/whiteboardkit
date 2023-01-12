@@ -43,7 +43,7 @@ class _ToolBoxState extends State<ToolBox> {
 
   @override
   void initState() {
-    brushSize = 5.0;
+    brushSize = 3.0;
     brushColor = Colors.black;
     erase = false;
     eraserSize = 20.0;
