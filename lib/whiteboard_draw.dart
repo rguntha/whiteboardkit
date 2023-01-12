@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:whiteboardkit/draw_chunker.dart';
-import 'package:xml/xml.dart' as xml;
+// import 'package:xml/xml.dart' as xml;
 
 part 'whiteboard_draw.g.dart';
 
@@ -155,175 +155,175 @@ class WhiteboardDraw {
 
   //   return '<svg height="${draw.height}" width="${draw.width}" data-wipes="${wipes.join(",")}" xmlns="http://www.w3.org/2000/svg" version="1.1">${pathsStrings.join('')}</svg>';
   // }
-
-  String getSVG({bool animation = true}) {
-    final builder = xml.XmlBuilder();
-    builder.processing('xml', 'version="1.1"');
-
-    builder.element("svg", nest: () {
-      var draw = this.clone();
-
-      var visibleSinceIndex = 0;
-      if (this.lines.lastIndexWhere((element) => element.wipe == true) != -1)
-        visibleSinceIndex =
-            draw.lines.lastIndexWhere((element) => element.wipe == true) + 1;
-
-      if (!animation && visibleSinceIndex > 0) {
-        draw.lines = draw.lines.skip(visibleSinceIndex + 1).toList();
-        visibleSinceIndex = 0;
-      }
-
-      var wipes = List<int>();
-
-      for (var i = 0; i < draw.lines.length; i++) {
-        var line = draw.lines[i];
-        if (line.wipe) {
-          wipes.add(i);
-          continue;
-        }
-
-        var hexColor = '#${line.color.value.toRadixString(16).substring(2)}';
-        var width = line.width;
-        var visible = i >= visibleSinceIndex;
-        if (line.points.length == 1) {
-          builder.element("circle", nest: () {
-            builder.attribute("cx", line.points[0].x);
-            builder.attribute("cy", line.points[0].y);
-            builder.attribute("r", width);
-            builder.attribute("fill", hexColor);
-            if (animation) builder.attribute("data-duration", line.duration);
-            if (animation)
-              builder.attribute("visibility", visible ? "visible" : "hidden");
-          });
-          // pathsStrings.add(
-          //     '<circle cx="${line.points[0].x}" cy="${line.points[0].y}" r="${width}" fill="${hexColor}" data-duration="${line.duration}" visibility="${visible ? "visible" : "hidden"}"/>');
-        } else if (line.points.length > 1) {
-          var moveCommand = "M${line.points.first.x},${line.points.first.y}";
-          var lineCommands =
-              line.points.skip(1).map((p) => "L${p.x},${p.y}").join(' ');
-
-          builder.element("path", nest: () {
-            builder.attribute("d", moveCommand + " " + lineCommands);
-            builder.attribute("stroke", hexColor);
-            builder.attribute("stroke-width", width);
-            builder.attribute("fill", "none");
-            builder.attribute("stroke-linecap", "round");
-            builder.attribute("stroke-linejoin", "round");
-            if (animation) builder.attribute("data-duration", line.duration);
-            if (animation)
-              builder.attribute("visibility", visible ? "visible" : "hidden");
-          });
-          // pathsStrings.add(
-          //     '<path d="${moveCommand} ${lineCommands}" stroke="${hexColor}" stroke-width="${width}" data-duration="${line.duration}" visibility="${visible ? "visible" : "hidden"}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>');
-        }
-      }
-      builder.attribute("version", "1.1");
-      builder.attribute("xmlns", "http://www.w3.org/2000/svg");
-      builder.attribute("height", draw.height);
-      builder.attribute("width", draw.width);
-      if (animation) builder.attribute("data-wipes", wipes.join(","));
-    });
-    return builder.build().document.findElements("svg").first.toString();
-
-    // return '<svg height="${draw.height}" width="${draw.width}" data-wipes="${wipes.join(",")}" xmlns="http://www.w3.org/2000/svg" version="1.1">${pathsStrings.join('')}</svg>';
-  }
-
-  factory WhiteboardDraw.fromWhiteboardSVG(String svg) {
-    final document = xml.parse(svg);
-    // print("document.toXmlString()");
-    // print(document.toXmlString());
-
-    // print('document.attributes.map((e) => e.name.local).join(",")');
-    // print(document.attributes.map((e) => e.name.local).join(","));
-
-    // print('document.attributes.map((e) => e.name.qualified).join(",")');
-    // print(document.attributes.map((e) => e.name.qualified).join(","));
-
-    // print('document.findAllElements("*").map((e) => e.name.qualified).join(",")');
-    // print(document.findElements("*").map((e) => e.name.qualified).join(","));
-
-    var svgElement = document.findElements("svg").first;
-
-    var height = svgElement.attributes
-        .firstWhere((att) => att.name.local == "height")
-        .value;
-    var width = svgElement.attributes
-        .firstWhere((att) => att.name.local == "width")
-        .value;
-
-    var lines = List<Line>();
-
-    svgElement.findElements("*").forEach((element) {
-      if (element.name.local == "path") {
-        var color = element.attributes
-            .firstWhere((att) => att.name.local == "stroke")
-            .value;
-        var width = element.attributes
-            .firstWhere((att) => att.name.local == "stroke-width")
-            .value;
-        var durationAttr = element.attributes.firstWhere(
-          (att) => att.name.local == "data-duration",
-          orElse: () => null,
-        );
-        var duration = durationAttr == null ? 0 : int.parse(durationAttr.value);
-        var points = element.attributes
-            .firstWhere((att) => att.name.local == "d")
-            .value
-            .split(" ")
-            .map((command) {
-          var coords = command.substring(1).split(",");
-          return new Point(double.parse(coords[0]), double.parse(coords[1]));
-        }).toList();
-        lines.add(Line(
-          points: points,
-          color: HexColor(color),
-          width: double.parse(width),
-          duration: duration,
-        ));
-      } else if (element.name.local == "circle") {
-        var color = element.attributes
-            .firstWhere((att) => att.name.local == "fill")
-            .value;
-        var width =
-            element.attributes.firstWhere((att) => att.name.local == "r").value;
-        var durationAttr = element.attributes.firstWhere(
-          (att) => att.name.local == "data-duration",
-          orElse: () => null,
-        );
-        var duration = durationAttr == null ? 0 : int.parse(durationAttr.value);
-        var x = element.attributes
-            .firstWhere((att) => att.name.local == "cx")
-            .value;
-        var y = element.attributes
-            .firstWhere((att) => att.name.local == "cy")
-            .value;
-        lines.add(Line(
-          points: [new Point(double.parse(x), double.parse(y))],
-          color: HexColor(color),
-          width: double.parse(width),
-          duration: duration,
-        ));
-      }
-    });
-
-    var wipesAttr = svgElement.attributes.firstWhere(
-      (att) => att.name.local == "data-wipes",
-      orElse: () => null,
-    );
-
-    var wipes = wipesAttr == null ? [] : wipesAttr.value.split(",");
-
-    wipes.forEach((wipe) {
-      if (int.tryParse(wipe) != null)
-        lines.insert(int.parse(wipe), new Line(wipe: true));
-    });
-
-    return WhiteboardDraw(
-      height: double.parse(height),
-      width: double.parse(width),
-      lines: lines,
-    );
-  }
+  //
+  // String getSVG({bool animation = true}) {
+  //   final builder = xml.XmlBuilder();
+  //   builder.processing('xml', 'version="1.1"');
+  //
+  //   builder.element("svg", nest: () {
+  //     var draw = this.clone();
+  //
+  //     var visibleSinceIndex = 0;
+  //     if (this.lines.lastIndexWhere((element) => element.wipe == true) != -1)
+  //       visibleSinceIndex =
+  //           draw.lines.lastIndexWhere((element) => element.wipe == true) + 1;
+  //
+  //     if (!animation && visibleSinceIndex > 0) {
+  //       draw.lines = draw.lines.skip(visibleSinceIndex + 1).toList();
+  //       visibleSinceIndex = 0;
+  //     }
+  //
+  //     var wipes = List<int>();
+  //
+  //     for (var i = 0; i < draw.lines.length; i++) {
+  //       var line = draw.lines[i];
+  //       if (line.wipe) {
+  //         wipes.add(i);
+  //         continue;
+  //       }
+  //
+  //       var hexColor = '#${line.color.value.toRadixString(16).substring(2)}';
+  //       var width = line.width;
+  //       var visible = i >= visibleSinceIndex;
+  //       if (line.points.length == 1) {
+  //         builder.element("circle", nest: () {
+  //           builder.attribute("cx", line.points[0].x);
+  //           builder.attribute("cy", line.points[0].y);
+  //           builder.attribute("r", width);
+  //           builder.attribute("fill", hexColor);
+  //           if (animation) builder.attribute("data-duration", line.duration);
+  //           if (animation)
+  //             builder.attribute("visibility", visible ? "visible" : "hidden");
+  //         });
+  //         // pathsStrings.add(
+  //         //     '<circle cx="${line.points[0].x}" cy="${line.points[0].y}" r="${width}" fill="${hexColor}" data-duration="${line.duration}" visibility="${visible ? "visible" : "hidden"}"/>');
+  //       } else if (line.points.length > 1) {
+  //         var moveCommand = "M${line.points.first.x},${line.points.first.y}";
+  //         var lineCommands =
+  //             line.points.skip(1).map((p) => "L${p.x},${p.y}").join(' ');
+  //
+  //         builder.element("path", nest: () {
+  //           builder.attribute("d", moveCommand + " " + lineCommands);
+  //           builder.attribute("stroke", hexColor);
+  //           builder.attribute("stroke-width", width);
+  //           builder.attribute("fill", "none");
+  //           builder.attribute("stroke-linecap", "round");
+  //           builder.attribute("stroke-linejoin", "round");
+  //           if (animation) builder.attribute("data-duration", line.duration);
+  //           if (animation)
+  //             builder.attribute("visibility", visible ? "visible" : "hidden");
+  //         });
+  //         // pathsStrings.add(
+  //         //     '<path d="${moveCommand} ${lineCommands}" stroke="${hexColor}" stroke-width="${width}" data-duration="${line.duration}" visibility="${visible ? "visible" : "hidden"}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>');
+  //       }
+  //     }
+  //     builder.attribute("version", "1.1");
+  //     builder.attribute("xmlns", "http://www.w3.org/2000/svg");
+  //     builder.attribute("height", draw.height);
+  //     builder.attribute("width", draw.width);
+  //     if (animation) builder.attribute("data-wipes", wipes.join(","));
+  //   });
+  //   return builder.build().document.findElements("svg").first.toString();
+  //
+  //   // return '<svg height="${draw.height}" width="${draw.width}" data-wipes="${wipes.join(",")}" xmlns="http://www.w3.org/2000/svg" version="1.1">${pathsStrings.join('')}</svg>';
+  // }
+  //
+  // factory WhiteboardDraw.fromWhiteboardSVG(String svg) {
+  //   final document = xml.parse(svg);
+  //   // print("document.toXmlString()");
+  //   // print(document.toXmlString());
+  //
+  //   // print('document.attributes.map((e) => e.name.local).join(",")');
+  //   // print(document.attributes.map((e) => e.name.local).join(","));
+  //
+  //   // print('document.attributes.map((e) => e.name.qualified).join(",")');
+  //   // print(document.attributes.map((e) => e.name.qualified).join(","));
+  //
+  //   // print('document.findAllElements("*").map((e) => e.name.qualified).join(",")');
+  //   // print(document.findElements("*").map((e) => e.name.qualified).join(","));
+  //
+  //   var svgElement = document.findElements("svg").first;
+  //
+  //   var height = svgElement.attributes
+  //       .firstWhere((att) => att.name.local == "height")
+  //       .value;
+  //   var width = svgElement.attributes
+  //       .firstWhere((att) => att.name.local == "width")
+  //       .value;
+  //
+  //   var lines = List<Line>();
+  //
+  //   svgElement.findElements("*").forEach((element) {
+  //     if (element.name.local == "path") {
+  //       var color = element.attributes
+  //           .firstWhere((att) => att.name.local == "stroke")
+  //           .value;
+  //       var width = element.attributes
+  //           .firstWhere((att) => att.name.local == "stroke-width")
+  //           .value;
+  //       var durationAttr = element.attributes.firstWhere(
+  //         (att) => att.name.local == "data-duration",
+  //         orElse: () => null,
+  //       );
+  //       var duration = durationAttr == null ? 0 : int.parse(durationAttr.value);
+  //       var points = element.attributes
+  //           .firstWhere((att) => att.name.local == "d")
+  //           .value
+  //           .split(" ")
+  //           .map((command) {
+  //         var coords = command.substring(1).split(",");
+  //         return new Point(double.parse(coords[0]), double.parse(coords[1]));
+  //       }).toList();
+  //       lines.add(Line(
+  //         points: points,
+  //         color: HexColor(color),
+  //         width: double.parse(width),
+  //         duration: duration,
+  //       ));
+  //     } else if (element.name.local == "circle") {
+  //       var color = element.attributes
+  //           .firstWhere((att) => att.name.local == "fill")
+  //           .value;
+  //       var width =
+  //           element.attributes.firstWhere((att) => att.name.local == "r").value;
+  //       var durationAttr = element.attributes.firstWhere(
+  //         (att) => att.name.local == "data-duration",
+  //         orElse: () => null,
+  //       );
+  //       var duration = durationAttr == null ? 0 : int.parse(durationAttr.value);
+  //       var x = element.attributes
+  //           .firstWhere((att) => att.name.local == "cx")
+  //           .value;
+  //       var y = element.attributes
+  //           .firstWhere((att) => att.name.local == "cy")
+  //           .value;
+  //       lines.add(Line(
+  //         points: [new Point(double.parse(x), double.parse(y))],
+  //         color: HexColor(color),
+  //         width: double.parse(width),
+  //         duration: duration,
+  //       ));
+  //     }
+  //   });
+  //
+  //   var wipesAttr = svgElement.attributes.firstWhere(
+  //     (att) => att.name.local == "data-wipes",
+  //     orElse: () => null,
+  //   );
+  //
+  //   var wipes = wipesAttr == null ? [] : wipesAttr.value.split(",");
+  //
+  //   wipes.forEach((wipe) {
+  //     if (int.tryParse(wipe) != null)
+  //       lines.insert(int.parse(wipe), new Line(wipe: true));
+  //   });
+  //
+  //   return WhiteboardDraw(
+  //     height: double.parse(height),
+  //     width: double.parse(width),
+  //     lines: lines,
+  //   );
+  // }
 }
 
 @JsonSerializable(nullable: false, explicitToJson: true)
