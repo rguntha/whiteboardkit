@@ -20,20 +20,23 @@ class DrawingController extends WhiteboardController {
 
   final _chunkController = StreamController<DrawChunk>.broadcast();
   DrawChunker _chunker;
-  final bool enableChunk;
+  final bool readonly;
+  final bool toolbox;
+  final ToolboxOptions toolboxOptions;
 
-  DrawingController({WhiteboardDraw draw, this.enableChunk = false})
+  DrawingController({WhiteboardDraw draw, this.readonly = false,
+    this.toolbox = true, this.toolboxOptions = const ToolboxOptions(undo: true)})
       : super(
-            readonly: false,
-            toolbox: true,
-            toolboxOptions: ToolboxOptions(undo: !enableChunk)) {
+            readonly: readonly,
+            toolbox: toolbox,
+            toolboxOptions: toolboxOptions) {
     if (draw != null) {
       this.draw = draw.copyWith();
       streamController.sink.add(this.draw.copyWith());
     }
 
     //chunker
-    if (enableChunk) Timer.periodic(Duration(seconds: 5), (_) => _flushChunk());
+    if (!toolboxOptions.undo) Timer.periodic(Duration(seconds: 5), (_) => _flushChunk());
   }
 
   @override

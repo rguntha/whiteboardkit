@@ -31,7 +31,7 @@ class _ToolBoxState extends State<ToolBox> {
 
   ToolBoxSelected selected;
 
-  final brushSizes = <double>[10, 20, 30, 40];
+  final brushSizes = <double>[1, 3, 5, 10, 20];
   final brushColors = <Color>[
     Colors.black,
     Colors.blue,
@@ -43,7 +43,7 @@ class _ToolBoxState extends State<ToolBox> {
 
   @override
   void initState() {
-    brushSize = 3.0;
+    brushSize = brushSizes[1];
     brushColor = Colors.black;
     erase = false;
     eraserSize = 20.0;
@@ -77,118 +77,95 @@ class _ToolBoxState extends State<ToolBox> {
         break;
     }
 
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Container(
-          width: MediaQuery.of(context).size.width - 1,
-          child: Center(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: row.length > 0
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        ...row,
-                      ],
-                    )
-                  : Container(),
-            ),
-          ),
-        ),
-        // Stack(
-        //   alignment: Alignment.center,
-        //   children: <Widget>[
-        //     Positioned(
-        //       top: 30,
-        //       height: 100,
-        //       width: 200,
-        //       child: Container(
-        //         child: selected == ToolBoxSelected.color
-        //             ? Row(
-        //                 mainAxisAlignment: MainAxisAlignment.center,
-        //                 crossAxisAlignment: CrossAxisAlignment.center,
-        //                 children: brushColors
-        //                     .map((color) => _buildBrushToolColorButton(color))
-        //                     .toList(),
-        //               )
-        //             : Container(),
-        //       ),
-        //     ),
-        //   ],
+        // Container(
+        //   margin: EdgeInsets.all(10),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: <Widget>[
+        //       // _buildToolButton(
+        //       //   Icon(
+        //       //     FontAwesomeIcons.pen,
+        //       //     size: 20,
+        //       //   ),
+        //       //   select: ToolBoxSelected.size,
+        //       // ),
+        //       // _buildToolButton(Icon(Icons.color_lens),
+        //       //     select: ToolBoxSelected.color, color: brushColor),
+        //       // _buildToolButton(
+        //       //   Icon(
+        //       //     FontAwesomeIcons.eraser,
+        //       //     color: new Color(0xffff93f5),
+        //       //     size: 26.0,
+        //       //   ),
+        //       //   select: ToolBoxSelected.erase,
+        //       // ),
+        //     ],
+        //   ),
+        //   decoration: BoxDecoration(
+        //     color: Colors.white,
+        //     borderRadius: BorderRadius.circular(20),
+        //   ),
         // ),
-        Container(
-          height: 30,
-        ),
-        Container(
-          height: 80.0,
-          color: Colors.transparent,
-          // width: widget.width,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              // Container(
-              //   margin: EdgeInsets.all(10),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: <Widget>[
-              //       // _buildToolButton(
-              //       //   Icon(
-              //       //     FontAwesomeIcons.pen,
-              //       //     size: 20,
-              //       //   ),
-              //       //   select: ToolBoxSelected.size,
-              //       // ),
-              //       // _buildToolButton(Icon(Icons.color_lens),
-              //       //     select: ToolBoxSelected.color, color: brushColor),
-              //       // _buildToolButton(
-              //       //   Icon(
-              //       //     FontAwesomeIcons.eraser,
-              //       //     color: new Color(0xffff93f5),
-              //       //     size: 26.0,
-              //       //   ),
-              //       //   select: ToolBoxSelected.erase,
-              //       // ),
-              //     ],
-              //   ),
-              //   decoration: BoxDecoration(
-              //     color: Colors.white,
-              //     borderRadius: BorderRadius.circular(20),
-              //   ),
-              // ),
-              Container(
-                margin: EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    // _buildToolButton(
-                    //   Icon(
-                    //     FontAwesomeIcons.file,
-                    //     size: 26.0,
-                    //     color: widget.color,
-                    //   ),
-                    //   onPress: () => {widget.sketchController.wipe()},
-                    // ),
-                    if (widget.options.undo)
-                      _buildToolButton(
-                          Icon(
-                            FontAwesomeIcons.undo,
-                            color: widget.color,
-                            size: 24,
-                          ),
-                          onPress: widget.sketchController.undo),
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  // color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              )
-            ],
-          ),
-        )
+        if (widget.options.undo)
+          _buildToolButton(
+              Icon(
+                FontAwesomeIcons.undo,
+                color: widget.color,
+                size: 24,
+              ),
+              onPress: widget.sketchController.undo),
       ],
     );
+    //
+    // return Column(
+    //   children: <Widget>[
+    //     // Container(
+    //     //   width: MediaQuery.of(context).size.width - 1,
+    //     //   child: Center(
+    //     //     child: SingleChildScrollView(
+    //     //       scrollDirection: Axis.horizontal,
+    //     //       child: row.length > 0
+    //     //           ? Row(
+    //     //               mainAxisAlignment: MainAxisAlignment.center,
+    //     //               crossAxisAlignment: CrossAxisAlignment.center,
+    //     //               children: <Widget>[
+    //     //                 ...row,
+    //     //               ],
+    //     //             )
+    //     //           : Container(),
+    //     //     ),
+    //     //   ),
+    //     // ),
+    //     // Stack(
+    //     //   alignment: Alignment.center,
+    //     //   children: <Widget>[
+    //     //     Positioned(
+    //     //       top: 30,
+    //     //       height: 100,
+    //     //       width: 200,
+    //     //       child: Container(
+    //     //         child: selected == ToolBoxSelected.color
+    //     //             ? Row(
+    //     //                 mainAxisAlignment: MainAxisAlignment.center,
+    //     //                 crossAxisAlignment: CrossAxisAlignment.center,
+    //     //                 children: brushColors
+    //     //                     .map((color) => _buildBrushToolColorButton(color))
+    //     //                     .toList(),
+    //     //               )
+    //     //             : Container(),
+    //     //       ),
+    //     //     ),
+    //     //   ],
+    //     // ),
+    //     // Container(
+    //     //   height: 30,
+    //     // ),
+    //
+    //   ],
+    // );
   }
 
   Widget _buildToolButton(Icon icon,

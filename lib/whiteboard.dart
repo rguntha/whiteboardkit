@@ -25,7 +25,6 @@ class WhiteboardState extends State<Whiteboard> {
   //drawing tools
 
   bool showToolBox;
-  double toolboxOffset;
 
   // Size boardSize;
   Size availbleSize;
@@ -41,7 +40,6 @@ class WhiteboardState extends State<Whiteboard> {
     super.initState();
 
     showToolBox = widget.controller.toolbox;
-    toolboxOffset = showToolBox ? HEIGHT_TO_SUBSTRACT : 0;
 
     if (widget.controller is PlayControls) {
       showControls = true;
@@ -75,10 +73,10 @@ class WhiteboardState extends State<Whiteboard> {
       // if (Size(constraints.maxWidth, constraints.maxHeight - toolboxOffset) !=
       //     availbleSize)
         widget.controller.initializeSize(
-            constraints.maxWidth, constraints.maxHeight - toolboxOffset);
+            constraints.maxWidth, constraints.maxHeight);
 
       availbleSize =
-          Size(constraints.maxWidth, constraints.maxHeight - toolboxOffset);
+          Size(constraints.maxWidth, constraints.maxHeight);
       // initialized = true;
 
       // print(
@@ -93,18 +91,17 @@ class WhiteboardState extends State<Whiteboard> {
         onWillPop: () async {
           return false;
         },
-        child: Column(
+        child: Stack(
           children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(bottom: toolboxOffset),
-                  width: boardSize.width,
-                  height: boardSize.height,
-                  alignment: FractionalOffset.center,
-                  decoration: BoxDecoration(
-                    border: widget.style.border,
-                  ),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Container(
+                width: boardSize.width,
+                height: boardSize.height,
+                decoration: widget.style.decoration,
+                alignment: FractionalOffset.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
                   child: GestureDetector(
                     onPanUpdate: (DragUpdateDetails details) {
                       if(widget.controller.readonly) return;
@@ -137,35 +134,31 @@ class WhiteboardState extends State<Whiteboard> {
                         }),
                   ),
                 ),
-                if (showToolBox)
-                  Positioned(
-                    bottom: 0.0,
-                    width: boardSize.width,
-                    child: ToolBox(
-                      sketchController: widget.controller,
-                      color: widget.style.toolboxColor,
-                      options: widget.controller.toolboxOptions,
-                    ),
-                  ),
-                if (showControls)
-                  showFastForward
-                      ? IconButton(
-                          key: ValueKey("skipAnimationButton"),
-                          icon: Icon(Icons.fast_forward),
-                          color: Colors.black26,
-                          onPressed: skipAnimationPressed,
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                        )
-                      : IconButton(
-                          icon: Icon(Icons.replay),
-                          color: Colors.black26,
-                          onPressed: restartAnimationPressed,
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                        )
-              ],
+              ),
             ),
+            if (showToolBox)
+              ToolBox(
+                sketchController: widget.controller,
+                color: widget.style.toolboxColor,
+                options: widget.controller.toolboxOptions,
+              ),
+            if (showControls)
+              showFastForward
+                  ? IconButton(
+                      key: ValueKey("skipAnimationButton"),
+                      icon: Icon(Icons.fast_forward),
+                      color: Colors.black26,
+                      onPressed: skipAnimationPressed,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.replay),
+                      color: Colors.black26,
+                      onPressed: restartAnimationPressed,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    )
           ],
         ),
       );

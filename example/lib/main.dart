@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whiteboardkit/toolbox_options.dart';
 import 'package:whiteboardkit/whiteboardkit.dart';
 
 void main() => runApp(MyApp());
@@ -25,12 +26,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   DrawingController controller;
+  DrawingController renderController;
+  DrawingController pasteController;
 
   @override
   void initState() {
-    controller = new DrawingController();
+    controller = DrawingController(toolbox: true, readonly: false);
+    renderController = DrawingController(toolbox: false, readonly: true);
+    pasteController = DrawingController(toolbox: false, readonly: true);
     controller.onChange().listen((draw){
-      //do something with it
+      renderController.streamController.add(draw);
     });
     super.initState();
   }
@@ -41,17 +46,53 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: Whiteboard(
-                controller: controller,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            child: Whiteboard(
+              style: WhiteboardStyle(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+              controller: controller,
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: Whiteboard(
+              style: WhiteboardStyle(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blue, width: 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              controller: renderController,
+            ),
+          ),
+          Row(
+            children: [
+              TextButton(onPressed: (){
+                pasteController.streamController.add(WhiteboardDraw.fromJson(controller.draw.toJson()));
+              }, child: Text('Paste')),
+              TextButton(onPressed: (){
+                pasteController.wipe();
+              }, child: Text('Clear')),
+            ],
+          ),
+          Expanded(
+            child: Whiteboard(
+              style: WhiteboardStyle(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.red, width: 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              controller: pasteController,
+            ),
+          ),
+        ],
       ),
     );
   }
