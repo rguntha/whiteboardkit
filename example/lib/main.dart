@@ -50,27 +50,45 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Expanded(
-            child: Whiteboard(
-              title: "Main Whiteboard",
-              style: WhiteboardStyle(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Whiteboard(
+                    title: "Main Whiteboard",
+                    style: WhiteboardStyle(
+                      border: Border.all(color: Colors.red, width: 1),
+                    ),
+                    controller: controller,
+                  ),
+                ),
               ),
-              controller: controller,
             ),
           ),
           Expanded(
-            child: Whiteboard(
-              title: "Mirror Whiteboard",
-              style: WhiteboardStyle(
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.blue, width: 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Whiteboard(
+                    title: "Mirror Whiteboard",
+                    style: WhiteboardStyle(
+                      border: Border.all(color: Colors.red.withOpacity(0.2), width: 1),
+                    ),
+                    controller: renderController,
+                  ),
+                ),
               ),
-              controller: renderController,
             ),
           ),
           Row(
@@ -87,10 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Whiteboard(
               title: "Paste Whiteboard",
               style: WhiteboardStyle(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.red, width: 1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                border: Border.all(color: Colors.red, width: 1),
               ),
               controller: pasteController,
             ),

@@ -94,47 +94,44 @@ class WhiteboardState extends State<Whiteboard> {
         },
         child: Stack(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Container(
-                width: boardSize.width,
-                height: boardSize.height,
-                decoration: widget.style.decoration,
-                alignment: FractionalOffset.center,
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: GestureDetector(
-                    onPanUpdate: (DragUpdateDetails details) {
-                      if(widget.controller.readonly) return;
+            Container(
+              width: boardSize.width,
+              height: boardSize.height,
 
-                      RenderBox object = context.findRenderObject();
-                      Offset _localPosition =
-                          object.globalToLocal(details.globalPosition);
-                      widget.controller.onPanUpdate(_localPosition);
-                      setState(() {});
-                    },
-                    onPanEnd: (DragEndDetails details) {
-                      if(widget.controller.readonly) return;
+              decoration: BoxDecoration(
+                border: widget.style.border,
+              ),
+              alignment: FractionalOffset.center,
+              child: GestureDetector(
+                onPanUpdate: (DragUpdateDetails details) {
+                  if(widget.controller.readonly) return;
 
-                      widget.controller.onPanEnd();
-                      setState(() {});
-                    },
-                    child: StreamBuilder<WhiteboardDraw>(
-                        stream: widget.controller.onChange(),
-                        builder: (context, snapshot) {
-                          var draw = snapshot.data;
+                  RenderBox object = context.findRenderObject();
+                  Offset _localPosition =
+                      object.globalToLocal(details.globalPosition);
+                  widget.controller.onPanUpdate(_localPosition);
+                  setState(() {});
+                },
+                onPanEnd: (DragEndDetails details) {
+                  if(widget.controller.readonly) return;
 
-                          return CustomPaint(
-                            key: UniqueKey(),
-                            foregroundPainter: new SuperPainter(draw),
-                            size: Size.infinite,
-                            child: Container(
-                              color: Colors.white,
-                            ),
-                          );
-                        }),
-                  ),
-                ),
+                  widget.controller.onPanEnd();
+                  setState(() {});
+                },
+                child: StreamBuilder<WhiteboardDraw>(
+                    stream: widget.controller.onChange(),
+                    builder: (context, snapshot) {
+                      var draw = snapshot.data;
+
+                      return CustomPaint(
+                        key: UniqueKey(),
+                        foregroundPainter: new SuperPainter(draw),
+                        size: Size.infinite,
+                        child: Container(
+                          color: Colors.white,
+                        ),
+                      );
+                    }),
               ),
             ),
             if(widget.title != null)
