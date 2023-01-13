@@ -14,8 +14,9 @@ const HEIGHT_TO_SUBSTRACT = 80.0;
 class Whiteboard extends StatefulWidget {
   final WhiteboardController controller;
   final WhiteboardStyle style;
+  final String title;
 
-  Whiteboard({@required this.controller, this.style = const WhiteboardStyle()});
+  Whiteboard({@required this.controller, this.style = const WhiteboardStyle(),this.title});
 
   @override
   WhiteboardState createState() => WhiteboardState();
@@ -136,11 +137,30 @@ class WhiteboardState extends State<Whiteboard> {
                 ),
               ),
             ),
+            if(widget.title != null)
+              Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    padding: EdgeInsets.all(5),
+                    child: Text(widget.title,style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                  ),
+                ),
+              ),
+
             if (showToolBox)
-              ToolBox(
-                sketchController: widget.controller,
-                color: widget.style.toolboxColor,
-                options: widget.controller.toolboxOptions,
+              Align(
+                alignment: Alignment.bottomRight,
+                child: ToolBox(
+                  sketchController: widget.controller,
+                  color: widget.style.toolboxColor,
+                  options: widget.controller.toolboxOptions,
+                ),
               ),
             if (showControls)
               showFastForward

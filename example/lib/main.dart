@@ -51,6 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Expanded(
             child: Whiteboard(
+              title: "Main Whiteboard",
               style: WhiteboardStyle(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 1),
@@ -62,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: Whiteboard(
+              title: "Mirror Whiteboard",
               style: WhiteboardStyle(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.blue, width: 1),
@@ -83,6 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: Whiteboard(
+              title: "Paste Whiteboard",
               style: WhiteboardStyle(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.red, width: 1),
