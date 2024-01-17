@@ -26,7 +26,7 @@ class WhiteboardDraw {
   }
 
   WhiteboardDraw copyWith(
-      {String id, List<Line> lines, double width, double height}) {
+      {String? id, List<Line>? lines, double? width, double? height}) {
     return WhiteboardDraw(
       lines: lines ?? this.lines.map((line) => line.clone()).toList(),
       width: width ?? this.width,
@@ -35,7 +35,7 @@ class WhiteboardDraw {
   }
 
   factory WhiteboardDraw.empty(
-          {@required double width, @required double height}) =>
+          {required double width, required double height}) =>
       WhiteboardDraw(height: height, width: width, lines: []);
 
   // Duration get drawingDuration {
@@ -61,7 +61,7 @@ class WhiteboardDraw {
 
     if (lines != null)
       lines.forEach((line) {
-        duration += Duration(milliseconds: line.duration);
+        duration += Duration(milliseconds: line.duration!);
       });
     return duration;
   }
@@ -69,7 +69,7 @@ class WhiteboardDraw {
   DrawChunker chunker(int seconds) => DrawChunker(this, seconds * 1000);
 
   List<Line> getLinesWithoutWipe() {
-    var lastWipeIndex = lines.lastIndexWhere((l) => l.wipe);
+    var lastWipeIndex = lines.lastIndexWhere((l) => l.wipe!);
     var visibleLines =
         lastWipeIndex > -1 ? lines.sublist(lastWipeIndex) : lines;
     return visibleLines;
@@ -86,9 +86,9 @@ class WhiteboardDraw {
         .lines
         .map((line) => line.clone()
           ..points = line.points
-              .map((point) => new Point(point.x * scale, point.y * scale))
+              .map((point) => new Point(point.x! * scale, point.y! * scale))
               .toList()
-          ..width = line.width * scale)
+          ..width = line.width! * scale)
         .toList();
   }
 
@@ -336,10 +336,10 @@ class Line {
   @JsonKey(fromJson: _colorFromString, toJson: _colorToString)
   Color color;
 
-  double width;
-  int duration;
+  double? width;
+  int? duration;
 
-  bool wipe;
+  bool? wipe;
 
   Line(
       {this.points = const [],
@@ -362,11 +362,11 @@ class Line {
   }
 
   Line copyWith(
-      {List<Point> points,
-      Color color,
-      double width,
-      bool wipe,
-      int duration}) {
+      {List<Point>? points,
+      Color? color,
+      double? width,
+      bool? wipe,
+      int? duration}) {
     return Line(
       points: points ?? this.points.map((p) => new Point(p.x, p.y)).toList(),
       color: color ?? this.color,
@@ -423,15 +423,15 @@ class HexColor extends Color {
 
 @JsonSerializable()
 class Point {
-  final double x;
-  final double y;
+  final double? x;
+  final double? y;
 
   Point(this.x, this.y);
   factory Point.fromJson(Map<String, dynamic> json) => _$PointFromJson(json);
   Map<String, dynamic> toJson() => _$PointToJson(this);
 
   factory Point.fromOffset(Offset offset) => new Point(offset.dx, offset.dy);
-  Offset toOffset() => Offset(x, y);
+  Offset toOffset() => Offset(x!, y!);
 
   bool operator ==(other) =>
       other is Point && this.x == other.x && this.y == other.y;

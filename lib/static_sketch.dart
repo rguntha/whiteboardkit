@@ -8,7 +8,7 @@ class StaticSketch extends StatefulWidget {
   final WhiteboardDraw draw;
   final WhiteboardStyle style;
 
-  StaticSketch({@required this.draw, this.style = const WhiteboardStyle()});
+  StaticSketch({required this.draw, this.style = const WhiteboardStyle()});
 
   @override
   State<StaticSketch> createState() => StaticSketchState();
@@ -16,7 +16,7 @@ class StaticSketch extends StatefulWidget {
 
 class StaticSketchState extends State<StaticSketch>
     with TickerProviderStateMixin {
-  StaticSketchController controller;
+  StaticSketchController? controller;
 
   @override
   void initState() {

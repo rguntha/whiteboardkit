@@ -16,26 +16,26 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  DrawingController controller;
-  DrawingController renderController;
-  DrawingController pasteController;
+  DrawingController? controller;
+  DrawingController? renderController;
+  DrawingController? pasteController;
 
   @override
   void initState() {
     controller = DrawingController(toolbox: true, readonly: false);
     renderController = DrawingController(toolbox: false, readonly: true);
     pasteController = DrawingController(toolbox: false, readonly: true);
-    controller.onChange().listen((draw){
-      renderController.streamController.add(draw);
+    controller!.onChange().listen((draw){
+      renderController!.streamController.add(draw);
     });
     super.initState();
   }
@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title!),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -94,10 +94,10 @@ class _MyHomePageState extends State<MyHomePage> {
           Row(
             children: [
               TextButton(onPressed: (){
-                pasteController.streamController.add(WhiteboardDraw.fromJson(controller.draw.toJson()));
+                pasteController!.streamController.add(WhiteboardDraw.fromJson(controller!.draw!.toJson()));
               }, child: Text('Paste')),
               TextButton(onPressed: (){
-                pasteController.wipe();
+                pasteController!.wipe();
               }, child: Text('Clear')),
             ],
           ),
@@ -117,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    controller.close();
+    controller!.close();
     super.dispose();
   }
 }

@@ -4,7 +4,7 @@ import 'whiteboard_draw.dart';
 
 class DrawChunker {
   final WhiteboardDraw draw;
-  DrawChunk lastChunk;
+  DrawChunk? lastChunk;
 
   int durationInMilliseconds;
 
@@ -12,9 +12,9 @@ class DrawChunker {
 
   int _lastLineIndex = -1;
   int _lastLinePointsChunked = 0;
-  int _lastLineDurationChunked = 0;
+  int? _lastLineDurationChunked = 0;
 
-  DrawChunk next() {
+  DrawChunk? next() {
     var draw = this.draw.copyWith();
 
     if (draw == null || draw.lines.length == 0) return null;
@@ -45,14 +45,14 @@ class DrawChunker {
           linePart.duration = durationInMilliseconds;
         } else {
           linePart.duration =
-              draw.lines[_lastLineIndex].duration - _lastLineDurationChunked;
+              draw.lines[_lastLineIndex].duration! - _lastLineDurationChunked!;
         }
         chunkDraw.lines.insert(0, linePart);
       } else {}
     }
 
     // search for wipe and reset if found
-    var wipeIndex = chunkDraw.lines.lastIndexWhere((a) => a.wipe);
+    var wipeIndex = chunkDraw.lines.lastIndexWhere((a) => a.wipe!);
     if (wipeIndex > -1) {
       chunkDraw.lines = chunkDraw.lines.skip(wipeIndex + 1).toList();
       lastChunk = null;
@@ -74,7 +74,7 @@ class DrawChunker {
     }
 
     return lastChunk = DrawChunk(
-      id: lastChunk == null ? 0 : lastChunk.id + 1,
+      id: lastChunk == null ? 0 : lastChunk!.id! + 1,
       draw: chunkDraw,
       createdAt: DateTime.now()
     );

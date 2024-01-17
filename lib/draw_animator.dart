@@ -15,23 +15,23 @@ class DrawAnimator {
   WhiteboardDraw finalDraw;
 
   @protected
-  Queue<Line> queued;
-  int _playId;
+  late Queue<Line> queued;
+  int? _playId;
 
   bool _skip = false;
 
   skip() => _skip = true;
 
-  Timer playDelay;
+  Timer? playDelay;
 
-  int _resizeId;
+  int? _resizeId;
   bool _resizeNeedResume = false;
 
   DrawAnimator(
-      {@required double width,
-      @required double height,
-      @required this.onChange,
-      @required this.onComplete})
+      {required double width,
+      required double height,
+      required this.onChange,
+      required this.onComplete})
       : finalDraw = WhiteboardDraw.empty(width: width, height: height) {
     queued = Queue.from([]);
     _playId = null;
@@ -87,7 +87,7 @@ class DrawAnimator {
 
   @protected
   void addLinesToQueue(List<Line> lines) {
-    List<Line> list = List<Line>();
+    List<Line> list = List<Line>.empty(growable: true);
     lines.forEach((l) => list.add(l));
 
     queued.addAll(list);
@@ -134,17 +134,17 @@ class DrawAnimator {
         finalDraw.lines.add(queuedLine.copyWith(points: []));
         // }
 
-        if (queuedLine.points.length == 0 && !_skip && queuedLine.duration > 0)
+        if (queuedLine.points.length == 0 && !_skip && queuedLine.duration! > 0)
           await Future.delayed(
             Duration(
-              milliseconds: queuedLine.duration,
+              milliseconds: queuedLine.duration!,
             ),
           );
         else
           for (var point in points) {
             var duration =
-                queuedLine.duration ~/ queuedLine.points.length;
-            if (!_skip && queuedLine.duration > 0)
+                queuedLine.duration! ~/ queuedLine.points.length;
+            if (!_skip && queuedLine.duration! > 0)
               await Future.delayed(
                 Duration(
                   milliseconds: duration,

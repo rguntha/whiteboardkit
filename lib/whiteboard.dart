@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:whiteboardkit/drawing_controller.dart';
 import 'package:whiteboardkit/toolbox.dart';
 import 'package:whiteboardkit/whiteboard_controller.dart';
 
@@ -12,11 +13,11 @@ typedef void OnChangeCallback(WhiteboardDraw draw);
 const HEIGHT_TO_SUBSTRACT = 80.0;
 
 class Whiteboard extends StatefulWidget {
-  final WhiteboardController controller;
+  final WhiteboardController? controller;
   final WhiteboardStyle style;
-  final String title;
+  final String? title;
 
-  Whiteboard({@required this.controller, this.style = const WhiteboardStyle(),this.title});
+  Whiteboard({required this.controller, this.style = const WhiteboardStyle(),this.title});
 
   @override
   WhiteboardState createState() => WhiteboardState();
@@ -25,32 +26,32 @@ class Whiteboard extends StatefulWidget {
 class WhiteboardState extends State<Whiteboard> {
   //drawing tools
 
-  bool showToolBox;
+  late bool showToolBox;
 
   // Size boardSize;
-  Size availbleSize;
+  Size? availbleSize;
 
   bool showControls = false;
   bool showFastForward = true;
 
-  StreamSubscription<Size> onSizeChangedSubscription;
-  StreamSubscription<WhiteboardDraw> onCompletedSubscription;
+  StreamSubscription<Size>? onSizeChangedSubscription;
+  StreamSubscription<WhiteboardDraw>? onCompletedSubscription;
 
   @override
   void initState() {
     super.initState();
 
-    showToolBox = widget.controller.toolbox;
+    showToolBox = widget.controller!.toolbox;
 
     if (widget.controller is PlayControls) {
       showControls = true;
       onCompletedSubscription = (widget.controller as PlayControls)
           .onComplete()
-          .listen((_) => setState(() => showFastForward = false));
+          ?.listen((_) => setState(() => showFastForward = false));
     }
 
     onSizeChangedSubscription =
-        widget.controller.onSizeChange().listen((_) => setState(() {}));
+        widget.controller!.onSizeChange().listen((_) => setState(() {}));
   }
 
   @override
@@ -73,7 +74,7 @@ class WhiteboardState extends State<Whiteboard> {
       // if (!initialized)
       // if (Size(constraints.maxWidth, constraints.maxHeight - toolboxOffset) !=
       //     availbleSize)
-        widget.controller.initializeSize(
+        widget.controller!.initializeSize(
             constraints.maxWidth, constraints.maxHeight);
 
       availbleSize =
@@ -83,7 +84,7 @@ class WhiteboardState extends State<Whiteboard> {
       // print(
       //     "initializeSize: W:${constraints.maxWidth} H:${constraints.maxHeight - toolboxOffset}");
 
-      var boardSize = widget.controller.draw.getSize();
+      var boardSize = widget.controller!.draw!.getSize();
       // print("boardSize: W:${boardSize.width} H:${boardSize.height}");
 
       // print("toolboxOffset:${toolboxOffset}");
@@ -104,22 +105,22 @@ class WhiteboardState extends State<Whiteboard> {
               alignment: FractionalOffset.center,
               child: GestureDetector(
                 onPanUpdate: (DragUpdateDetails details) {
-                  if(widget.controller.readonly) return;
+                  if(widget.controller!.readonly) return;
 
-                  RenderBox object = context.findRenderObject();
+                  RenderBox object = context.findRenderObject() as RenderBox;
                   Offset _localPosition =
                       object.globalToLocal(details.globalPosition);
-                  widget.controller.onPanUpdate(_localPosition);
+                  widget.controller!.onPanUpdate(_localPosition);
                   setState(() {});
                 },
                 onPanEnd: (DragEndDetails details) {
-                  if(widget.controller.readonly) return;
+                  if(widget.controller!.readonly) return;
 
-                  widget.controller.onPanEnd();
+                  widget.controller!.onPanEnd();
                   setState(() {});
                 },
-                child: StreamBuilder<WhiteboardDraw>(
-                    stream: widget.controller.onChange(),
+                child: StreamBuilder<WhiteboardDraw?>(
+                    stream: widget.controller!.onChange(),
                     builder: (context, snapshot) {
                       var draw = snapshot.data;
 
@@ -145,7 +146,7 @@ class WhiteboardState extends State<Whiteboard> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                     padding: EdgeInsets.all(5),
-                    child: Text(widget.title,style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                    child: Text(widget.title!,style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
                   ),
                 ),
               ),
@@ -154,9 +155,9 @@ class WhiteboardState extends State<Whiteboard> {
               Align(
                 alignment: Alignment.bottomRight,
                 child: ToolBox(
-                  sketchController: widget.controller,
+                  sketchController: widget.controller as DrawingController?,
                   color: widget.style.toolboxColor,
-                  options: widget.controller.toolboxOptions,
+                  options: widget.controller!.toolboxOptions,
                 ),
               ),
             if (showControls)
@@ -195,24 +196,24 @@ class WhiteboardState extends State<Whiteboard> {
 }
 
 class SuperPainter extends CustomPainter {
-  WhiteboardDraw draw;
+  WhiteboardDraw? draw;
 
-  List<Line> visibleLines;
+  late List<Line> visibleLines;
 
-  Size size;
+  Size? size;
 
   SuperPainter(this.draw) {
     if (draw != null)
-      size = draw.getSize();
+      size = draw!.getSize();
     else
       size = new Size(0, 0);
 
-    if (draw != null && draw.lines != null) {
-      var lastWipeIndex = draw.lines.lastIndexWhere((l) => l.wipe);
+    if (draw != null && draw!.lines != null) {
+      var lastWipeIndex = draw!.lines.lastIndexWhere((l) => l.wipe!);
       visibleLines =
-          lastWipeIndex > -1 ? draw.lines.sublist(lastWipeIndex) : draw.lines;
+          lastWipeIndex > -1 ? draw!.lines.sublist(lastWipeIndex) : draw!.lines;
     } else
-      visibleLines = new List<Line>();
+      visibleLines = new List<Line>.empty(growable: true);
   }
 
   @override
@@ -230,7 +231,7 @@ class SuperPainter extends CustomPainter {
     visibleLines.forEach((line) {
       paint = paint
         ..color = line.color
-        ..strokeWidth = line.width;
+        ..strokeWidth = line.width!;
 
       drawLine(canvas, paint, line);
     });
@@ -248,6 +249,6 @@ class SuperPainter extends CustomPainter {
   @override
   bool shouldRepaint(SuperPainter oldDelegate) =>
       oldDelegate.size != size ||
-      oldDelegate.visibleLines.fold(0, (total, l) => l.points.length + total) !=
-          visibleLines.fold(0, (total, l) => l.points.length + total);
+      oldDelegate.visibleLines.fold(0, (dynamic total, l) => l.points.length + total) !=
+          visibleLines.fold(0, (dynamic total, l) => l.points.length + total);
 }

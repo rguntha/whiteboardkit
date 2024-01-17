@@ -9,7 +9,7 @@ class StaticSketchController extends WhiteboardController {
     if (draw.lines.lastIndexWhere((element) => element.wipe == true) != -1)
       this.draw = draw.clone().copyWith(
           lines: draw.lines.skip(
-              draw.lines.lastIndexWhere((element) => element.wipe == true)));
+              draw.lines.lastIndexWhere((element) => element.wipe == true)) as List<Line>?);
     else
       this.draw = draw.clone();
   }

@@ -8,28 +8,28 @@ enum ToolBoxSelected { none, size, color, erase }
 
 class ToolBox extends StatefulWidget {
   // final double width;
-  final DrawingController sketchController;
+  final DrawingController? sketchController;
   final Color color;
   final ToolboxOptions options;
 
   ToolBox(
       {
       // @required this.width,
-      @required this.sketchController,
-      @required this.color,
-      @required this.options});
+      required this.sketchController,
+      required this.color,
+      required this.options});
 
   @override
   _ToolBoxState createState() => _ToolBoxState();
 }
 
 class _ToolBoxState extends State<ToolBox> {
-  double brushSize;
-  Color brushColor;
-  bool erase;
-  double eraserSize;
+  double? brushSize;
+  Color? brushColor;
+  late bool erase;
+  double? eraserSize;
 
-  ToolBoxSelected selected;
+  ToolBoxSelected? selected;
 
   final brushSizes = <double>[1, 3, 5, 10, 20];
   final brushColors = <Color>[
@@ -50,7 +50,7 @@ class _ToolBoxState extends State<ToolBox> {
 
     selected = ToolBoxSelected.none;
 
-    widget.sketchController.brushSize = brushSize;
+    widget.sketchController!.brushSize = brushSize;
 
     super.initState();
   }
@@ -116,7 +116,7 @@ class _ToolBoxState extends State<ToolBox> {
                 color: widget.color,
                 size: 24,
               ),
-              onPress: widget.sketchController.undo),
+              onPress: widget.sketchController!.undo),
       ],
     );
     //
@@ -169,8 +169,8 @@ class _ToolBoxState extends State<ToolBox> {
   }
 
   Widget _buildToolButton(Icon icon,
-      {ToolBoxSelected select,
-      Function onPress,
+      {ToolBoxSelected? select,
+      Function? onPress,
       Color color = Colors.black54,
       double size = 30.0}) {
     return IconButton(
@@ -180,7 +180,7 @@ class _ToolBoxState extends State<ToolBox> {
       onPressed: () {
         if (select == null) {
           hide();
-          onPress();
+          onPress!();
         } else {
           if (selected == select)
             hide();
@@ -285,7 +285,7 @@ class _ToolBoxState extends State<ToolBox> {
     setState(() {
       changeEraser(false, eraserSize);
       brushSize = size;
-      widget.sketchController.brushSize = brushSize;
+      widget.sketchController!.brushSize = brushSize;
       hide();
     });
   }
@@ -294,17 +294,17 @@ class _ToolBoxState extends State<ToolBox> {
     setState(() {
       changeEraser(false, eraserSize);
       brushColor = color;
-      widget.sketchController.brushColor = color;
+      widget.sketchController!.brushColor = color;
       hide();
     });
   }
 
-  void changeEraser(bool erase, double size) {
+  void changeEraser(bool erase, double? size) {
     setState(() {
       eraserSize = size;
       this.erase = erase;
-      widget.sketchController.erase = erase;
-      widget.sketchController.eraserSize = size;
+      widget.sketchController!.erase = erase;
+      widget.sketchController!.eraserSize = size;
       hide();
     });
   }
