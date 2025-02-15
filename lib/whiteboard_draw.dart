@@ -437,5 +437,5 @@ class Point {
       other is Point && this.x == other.x && this.y == other.y;
 
   @override
-  int get hashCode => hashValues(this.x, this.y);
+  int get hashCode => Object.hash(this.x, this.y);
 }
